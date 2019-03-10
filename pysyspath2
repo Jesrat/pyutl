@@ -1,8 +1,10 @@
 #!/usr/bin/env python2
 import pyutils as utl
 
+
 def main():
 	utl.pysyspath()
+
 
 if __name__ == "__main__":
 	main()
