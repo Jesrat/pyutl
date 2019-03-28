@@ -2,8 +2,25 @@ import cx_Oracle
 
 APP_CTX_NAMESPACE = "USERENV"
 APP_CTX_ENTRIES = [
-    ( APP_CTX_NAMESPACE, "MODULE", "modulo prueba"),
+    (APP_CTX_NAMESPACE, "MODULE", "modulo prueba"),
 ]
+
+
+def dbmsoutput(cursor):
+    """
+        dbmsoutput must be enabled before execute statement
+        cur.callproc("dbms_output.enable",(None,))
+    """
+    output = str()
+    status = cursor.var(cx_Oracle.NUMBER)
+    dbmsline = cursor.var(cx_Oracle.STRING)
+    while True:
+        cursor.callproc("dbms_output.get_line", (dbmsline, status))
+        if status.getvalue():
+            break
+        output += f'{dbmsline.getvalue()} \n'
+
+    return output
 
 
 class OraConn(cx_Oracle.Connection):
