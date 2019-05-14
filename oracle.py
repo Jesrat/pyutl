@@ -23,6 +23,16 @@ def dbmsoutput(cursor):
     return output
 
 
+def cur_as_dict(cursor): 
+    """
+    needs a open cursor and returns all rows as dict, be careful
+    with large results
+    """
+    columns = [cols[0] for cols in cursor.description]
+    ret = [dict(zip(columns, row)) for row in cursor]
+    return ret
+
+
 class OraConn(cx_Oracle.Connection):
     # instance can return a cursor or the whole conn
     def __init__(self, str_conn, ret="conn", module_name=None):
