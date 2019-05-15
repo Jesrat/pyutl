@@ -33,13 +33,13 @@ class SendMail:
             self.conn.starttls()
         self.conn.login(self.user, self.pssw)
 
-    def content(self, fromaddr, toaddr, subject, msg):
-        if not isinstance(toaddr, list):
+    def content(self, from_address, to_address, subject, msg):
+        if not isinstance(to_address, list):
             raise AssertionError('destination address should be a list []')
         self.msg = MIMEMultipart()
         self.msg['Subject'] = subject
-        self.msg['From'] = fromaddr
-        self.msg['To'] = COMMASPACE.join(toaddr)
+        self.msg['From'] = from_address
+        self.msg['To'] = COMMASPACE.join(to_address)
         self.msg.attach(MIMEText(msg, 'html'))
 
     def attach(self, files):

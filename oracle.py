@@ -8,8 +8,8 @@ APP_CTX_ENTRIES = [
 
 def dbmsoutput(cursor):
     """
-        dbmsoutput must be enabled before execute statement
-        cur.callproc("dbms_output.enable",(None,))
+    dbmsoutput must be enabled before execute statement
+    cur.callproc("dbms_output.enable",(None,))
     """
     output = str()
     status = cursor.var(cx_Oracle.NUMBER)
