@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: pyutl
+Version: 2.5
+Summary: functions and utilities to recycle code
+Home-page: https://git.binkfe.com/jesrat/pyutl
+Author: Josue Gomez <jgomez@jesrat.com>
+Author-email: jgomez@binkfe.com
+License: UNKNOWN
+Description: pyutils
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown

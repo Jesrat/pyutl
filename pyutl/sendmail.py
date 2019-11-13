@@ -33,13 +33,19 @@ class SendMail:
             self.conn.starttls()
         self.conn.login(self.user, self.pssw)
 
-    def content(self, from_address, to_address, subject, msg):
+    def content(self, from_address, to_address, subject, msg, cc=None):
         if not isinstance(to_address, list):
             raise AssertionError('destination address should be a list []')
+        if cc:
+            if not isinstance(cc, list):
+                raise AssertionError('cc address should be a list []')
+
         self.msg = MIMEMultipart()
         self.msg['Subject'] = subject
         self.msg['From'] = from_address
         self.msg['To'] = COMMASPACE.join(to_address)
+        if cc:
+            self.msg['Cc'] = COMMASPACE.join(cc)
         self.msg.attach(MIMEText(msg, 'html'))
 
     def attach(self, files):

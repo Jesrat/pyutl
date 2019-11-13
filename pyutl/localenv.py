@@ -1,14 +1,22 @@
 import os
 import sys
+import json
 
 
 class NoEnvironmentFile(Exception):
     pass
 
 
+class KeyNotFound(Exception):
+    pass
+
+
+DEFAULT = object()
+
+
 class LocalEnv:
     def __init__(self):
-        self.file = None
+        self.files = []
         self.data = {}
 
     def load(self, file=None):
@@ -17,29 +25,35 @@ class LocalEnv:
         in invoker module's directory
         """
         if file is not None:
-            self.file = file
+            self.files.append({'file': file, 'exists': '', 'loaded': False})
         else:
-            self.file = self._invoker()
+            self.files.append({'file': self._invoker(), 'exists': '', 'loaded': False})
 
-        if not os.path.isfile(self.file):
-            raise NoEnvironmentFile(f'for file {self.file}')
+        # search all files given and load them
+        for file_dict in self.files:
+            file_dict['exists'] = os.path.isfile(file_dict['file'])
+            if file_dict['exists'] and not file_dict['loaded']:
+                with open(file_dict['file']) as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line or line.startswith('#') or '=' not in line:
+                            continue
+                        key, value = line.split('=', 1)
+                        key = key.replace('export', '')
+                        key = key.strip()
+                        value = value.strip().strip('\'"')
+                        self.data[key] = value
+                    file_dict['loaded'] = True
 
-        with open(self.file) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith('#') or '=' not in line:
-                    continue
-                key, value = line.split('=', 1)
-                key = key.replace('export', '')
-                key = key.strip()
-                value = value.strip().strip('\'"')
-                self.data[key] = value
-
-    def get(self, key, cast=None):
-        if cast is None:
-            return self.data[key]
-
-        return cast(self.data[key])
+    def get(self, key, default=DEFAULT, cast=None):
+        try:
+            ret_val = self.data[key] if cast is None else cast(self.data[key])
+        except KeyError:
+            if default != DEFAULT:
+                ret_val = default if cast is None else cast(default)
+            else:
+                raise KeyNotFound(f'value not found in files: \n{json.dumps(self.files, indent=4)}')
+        return ret_val
 
     @staticmethod
     def _invoker():
@@ -53,3 +67,4 @@ class LocalEnv:
 
 
 localenv = LocalEnv()
+localenv.load()

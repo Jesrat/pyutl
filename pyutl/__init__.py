@@ -1,5 +1,3 @@
-# functions to recycle code
-
 r"""
 To use, simply 'import pyutils' 
 
@@ -10,14 +8,18 @@ shellExecute can receive a cmd as str or arr example
     (b"'hello world'\n", b'')
 """
 
+__title__ = 'pyutl'
+__description__ = 'functions and utilities to recycle code'
+__url__ = 'https://git.binkfe.com/jesrat/pyutl'
+__version__ = '2.5'
 __author__ = 'Josue Gomez <jgomez@jesrat.com>'
-__maintainer__ = "Josue Gomez"
 __email__ = "jgomez@binkfe.com"
+__maintainer__ = "Josue Gomez"
 __license__ = "MIT"
-__version__ = '2.0'
 __all__ = ['', ]
 __status__ = "production"
 __date__ = "30 January 2019"
+__copyright__ = 'Copyright 2019 Josue Gomez'
 
 
 import sys
@@ -43,3 +45,25 @@ def progress_bar(progress, total, status=''):
     bar = '■' * fill_len + '-' * (bar_len - fill_len)
     sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percent, '%', status))
     sys.stdout.flush()
+
+
+def read_streamed_file(file, chunk_size=10):
+    """
+    Reads a hugh file by chunks (10 lines default)
+    :param file
+    :param chunk_size (10 lines default)
+    :return: chunk by chunk
+    """
+    counter = 0
+    ret_lines = []
+    with open(file) as f:
+        while True:
+            counter += 1
+            line = f.readline()
+            if line:
+                ret_lines.append((counter, line))
+            if (counter/chunk_size).is_integer() or not line:
+                yield ret_lines
+                ret_lines = []
+            if not line:
+                break
