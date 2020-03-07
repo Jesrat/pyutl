@@ -1,8 +1,8 @@
 Metadata-Version: 2.1
 Name: pyutl
-Version: 2.6
+Version: 2.7
 Summary: functions and utilities to recycle code
-Home-page: https://git.binkfe.com/jesrat/pyutl
+Home-page: https://github.com/Jesrat/pyutl.git
 Author: Josue Gomez <jgomez@jesrat.com>
 Author-email: jgomez@binkfe.com
 License: UNKNOWN
