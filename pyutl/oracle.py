@@ -52,5 +52,5 @@ class OraConn(cx_Oracle.Connection):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.ret == "cursor":
-            return self.cur.close()
+            self.cur.close()
         super().__exit__(exc_type, exc_val, exc_tb)
