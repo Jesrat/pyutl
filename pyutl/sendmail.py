@@ -59,8 +59,6 @@ class SendMail:
             fl['Content-Disposition'] = f'attachment; filename="{filename}"'
             self.msg.attach(fl)
 
-        print(self.msg)
-
     def send(self):
         if self.msg is None:
             raise Exception('msg is not defined')
