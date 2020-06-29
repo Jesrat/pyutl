@@ -65,16 +65,21 @@ class LocalEnv:
         try:
             ret_val = self.data[key] if cast is None else self._cast(cast, self.data[key])
         except KeyError:
-            if default != DEFAULT:
+            from_os = os.environ.get(key)
+            if from_os:
+                ret_val = from_os if cast is None else self._cast(cast, from_os)
+            elif default != DEFAULT:
                 ret_val = default if cast is None else self._cast(cast, default)
             else:
                 raise KeyNotFound(f'value not found in files: \n{json.dumps(self.files, indent=4)}')
         return ret_val
 
-    def _invoker(self):
+    @staticmethod
+    def _invoker():
         # tip from:
         # https://github.com/henriquebastos/python-decouple/blob/master/decouple.py
         # MAGIC! Get the caller's module path.
+        # noinspection PyProtectedMember
         frame = sys._getframe()
         path = os.path.dirname(frame.f_back.f_back.f_back.f_code.co_filename)
         file = os.path.join(path, '.env')
