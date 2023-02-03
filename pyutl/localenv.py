@@ -28,10 +28,15 @@ class LocalEnv:
         If no file is defined, the .env file will be searched
         in invoker module's directory
         """
-        if file is None:
-            file = self._invoker()
-
-        self.files.append({'file': file, 'exists': '', 'loaded': False})
+        if file:
+            self.files.append({'file': file, 'exists': '', 'loaded': False})
+        else:
+            self.files.append({'file': self._invoker(), 'exists': '', 'loaded': False})
+            self.files.append({
+                'file': os.path.join(os.getcwd(), '.env'),
+                'exists': '',
+                'loaded': False
+            })
 
         # search all files given and load them
         for file_dict in self.files:
@@ -63,7 +68,12 @@ class LocalEnv:
             self.first_load = True
 
         try:
-            ret_val = self.data[key] if cast is None else self._cast(cast, self.data[key])
+            ret_val = self.data[key]
+            # support for 1password CLI <op run -->
+            if ret_val.startswith('op://') and os.environ.get(key):
+                ret_val = os.environ.get(key) if cast is None else self._cast(cast, os.environ.get(key))
+            else:
+                ret_val = ret_val if cast is None else self._cast(cast, self.data[key])
         except KeyError:
             from_os = os.environ.get(key)
             if from_os:
