@@ -11,15 +11,21 @@ shellExecute can receive a cmd as str or arr example
 __title__ = 'pyutl'
 __description__ = 'functions and utilities to recycle code'
 __url__ = 'https://github.com/Jesrat/pyutl.git'
-__version__ = '2.9.1'
+__version__ = '2.9.2'
 __author__ = 'Josue Gomez <jgomez@jesrat.com>'
 __email__ = "jgomez@cloudsyss.com"
 __maintainer__ = "Josue Gomez"
 __license__ = "MIT"
-__all__ = ['', ]
 __status__ = "production"
 __date__ = "30 January 2019"
 __copyright__ = 'Copyright 2019 Josue Gomez'
+
+__all__ = [
+    'resize_tty',
+    'shell_execute',
+    'progress_bar',
+    'read_streamed_file'
+]
 
 
 import sys
@@ -31,7 +37,9 @@ def resize_tty(rows, cols):
 
 
 def shell_execute(cmd, stdin=None):
-    proc = subprocess.Popen(cmd, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(
+        cmd, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = proc.communicate()
     return stdout, stderr, proc.returncode
 
@@ -39,7 +47,7 @@ def shell_execute(cmd, stdin=None):
 def progress_bar(progress, total, status=''):
     tty_size = shell_execute(['stty', 'size'])
     tty_size = tty_size[0].decode().split(' ')
-    bar_len = round(int(tty_size[1])/100*90)
+    bar_len = round(int(tty_size[1])/100*90) - len(status)
     fill_len = int(round(bar_len * progress / float(total)))
     percent = round(100.0 * progress / float(total), 1)
     bar = '■' * fill_len + '-' * (bar_len - fill_len)
