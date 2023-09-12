@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from subprocess import Popen, PIPE
 
 try:
     from onepasswordconnectsdk.client import (
@@ -95,19 +96,24 @@ class LocalEnv:
         return ret_val
 
     def op_get(self, key):
-        if not onepassword_imported:
-            raise Exception(f'onepasswordsdk could not be imported')
-        op_client: Client = new_client(
-            self.get('OP_CONNECT_HOST'),
-            self.get('OP_CONNECT_TOKEN'),
-            self.get('OP_CONNECT_CLIENT_ASYNC', cast=bool)
-        )
-        values = key.replace('op://', '').split('/')
-        item = op_client.get_item(values[1], values[0])
-        for f in item.fields:
-            if f.label == values[2]:
-                return f.value
-        return ''
+        try:
+            if not onepassword_imported:
+                raise Exception(f'onepasswordsdk could not be imported')
+            op_client: Client = new_client(
+                self.get('OP_CONNECT_HOST'),
+                self.get('OP_CONNECT_TOKEN'),
+                self.get('OP_CONNECT_CLIENT_ASYNC', cast=bool)
+            )
+            values = key.replace('op://', '').split('/')
+            item = op_client.get_item(values[1], values[0])
+            for f in item.fields:
+                if f.label == values[2]:
+                    return f.value
+            return ''
+        except KeyNotFound:
+            p = Popen(['op', 'read', f"--account={self.get('OP_ACCOUNT')}", key], stdout=PIPE, stderr=PIPE)
+            stdout_data = p.communicate()
+            return stdout_data[0].decode().strip()
 
     @staticmethod
     def _invoker():
