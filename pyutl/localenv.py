@@ -2,6 +2,16 @@ import os
 import sys
 import json
 
+try:
+    from onepasswordconnectsdk.client import (
+        Client,
+        new_client_from_environment,
+        new_client
+    )
+    onepassword_imported = True
+except ImportError:
+    onepassword_imported = False
+
 
 class NoEnvironmentFile(Exception):
     pass
@@ -70,8 +80,8 @@ class LocalEnv:
         try:
             ret_val = self.data[key]
             # support for 1password CLI <op run -->
-            if ret_val.startswith('op://') and os.environ.get(key):
-                ret_val = os.environ.get(key) if cast is None else self._cast(cast, os.environ.get(key))
+            if ret_val.startswith('op://'):
+                ret_val = self.op_get(ret_val) if cast is None else self._cast(cast, self.op_get(ret_val))
             else:
                 ret_val = ret_val if cast is None else self._cast(cast, self.data[key])
         except KeyError:
@@ -83,6 +93,21 @@ class LocalEnv:
             else:
                 raise KeyNotFound(f'value not found in files: \n{json.dumps(self.files, indent=4)}')
         return ret_val
+
+    def op_get(self, key):
+        if not onepassword_imported:
+            raise Exception(f'onepasswordsdk could not be imported')
+        op_client: Client = new_client(
+            self.get('OP_CONNECT_HOST'),
+            self.get('OP_CONNECT_TOKEN'),
+            self.get('OP_CONNECT_CLIENT_ASYNC', cast=bool)
+        )
+        values = key.replace('op://', '').split('/')
+        item = op_client.get_item(values[1], values[0])
+        for f in item.fields:
+            if f.label == values[2]:
+                return f.value
+        return ''
 
     @staticmethod
     def _invoker():
