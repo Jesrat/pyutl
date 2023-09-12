@@ -11,7 +11,7 @@ shellExecute can receive a cmd as str or arr example
 __title__ = 'pyutl'
 __description__ = 'functions and utilities to recycle code'
 __url__ = 'https://github.com/Jesrat/pyutl.git'
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 __author__ = 'Josue Gomez <jgomez@jesrat.com>'
 __email__ = "jgomez@cloudsyss.com"
 __maintainer__ = "Josue Gomez"

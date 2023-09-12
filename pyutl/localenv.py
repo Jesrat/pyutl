@@ -6,7 +6,6 @@ from subprocess import Popen, PIPE
 try:
     from onepasswordconnectsdk.client import (
         Client,
-        new_client_from_environment,
         new_client
     )
     onepassword_imported = True
@@ -98,7 +97,7 @@ class LocalEnv:
     def op_get(self, key):
         try:
             if not onepassword_imported:
-                raise Exception(f'onepasswordsdk could not be imported')
+                self.op_read_get(key)
             op_client: Client = new_client(
                 self.get('OP_CONNECT_HOST'),
                 self.get('OP_CONNECT_TOKEN'),
@@ -111,9 +110,12 @@ class LocalEnv:
                     return f.value
             return ''
         except KeyNotFound:
-            p = Popen(['op', 'read', f"--account={self.get('OP_ACCOUNT')}", key], stdout=PIPE, stderr=PIPE)
-            stdout_data = p.communicate()
-            return stdout_data[0].decode().strip()
+            self.op_read_get(key)
+
+    def op_read_get(self, key):
+        p = Popen(['op', 'read', f"--account={self.get('OP_ACCOUNT')}", key], stdout=PIPE, stderr=PIPE)
+        stdout_data = p.communicate()
+        return stdout_data[0].decode().strip()
 
     @staticmethod
     def _invoker():
