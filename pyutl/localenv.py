@@ -97,7 +97,7 @@ class LocalEnv:
     def op_get(self, key):
         try:
             if not onepassword_imported:
-                self.op_read_get(key)
+                return self.op_read_get(key)
             op_client: Client = new_client(
                 self.get('OP_CONNECT_HOST'),
                 self.get('OP_CONNECT_TOKEN'),
@@ -110,7 +110,7 @@ class LocalEnv:
                     return f.value
             return ''
         except KeyNotFound:
-            self.op_read_get(key)
+            return self.op_read_get(key)
 
     def op_read_get(self, key):
         p = Popen(['op', 'read', f"--account={self.get('OP_ACCOUNT')}", key], stdout=PIPE, stderr=PIPE)
